@@ -20,72 +20,37 @@ fi
 
 pushd "$(dirname "$0")"
 
-echo "Running torch tests"
-$PYCMD test_torch.py $@
+distributed_set_up() {
+  export TEMP_DIR="$(mktemp -d)"
+  rm -rf "$TEMP_DIR/"*
+  mkdir "$TEMP_DIR/barrier"
+  mkdir "$TEMP_DIR/test_dir"
+}
 
-echo "Running autograd tests"
-$PYCMD test_autograd.py $@
+distributed_tear_down() {
+  rm -rf "$TEMP_DIR"
+}
 
-echo "Running sparse tests"
-$PYCMD test_sparse.py $@
+trap distributed_tear_down EXIT SIGHUP SIGINT SIGTERM
 
-echo "Running nn tests"
-$PYCMD test_nn.py $@
+echo "Running distributed tests for the TCP backend"
+distributed_set_up
+BACKEND=tcp WORLD_SIZE=3 $PYCMD ./test_distributed.py
+distributed_tear_down
 
-echo "Running legacy nn tests"
-$PYCMD test_legacy_nn.py $@
+echo "Running distributed tests for the Gloo backend"
+distributed_set_up
+BACKEND=gloo WORLD_SIZE=3 $PYCMD ./test_distributed.py
+distributed_tear_down
 
-echo "Running optim tests"
-$PYCMD test_optim.py $@
-
-echo "Running multiprocessing tests"
-$PYCMD test_multiprocessing.py $@
-MULTIPROCESSING_METHOD=spawn $PYCMD test_multiprocessing.py $@
-MULTIPROCESSING_METHOD=forkserver $PYCMD test_multiprocessing.py $@
-
-echo "Running util tests"
-$PYCMD test_utils.py $@
-
-echo "Running dataloader tests"
-$PYCMD test_dataloader.py $@
-
-echo "Running cuda tests"
-$PYCMD test_cuda.py $@
-
-echo "Running NCCL tests"
-$PYCMD test_nccl.py $@
-
-################################################################################
-if [[ "$TEST_DISTRIBUTED" -eq 1 ]]; then
-    distributed_set_up() {
-        export TEMP_DIR="$(mktemp -d)"
-        rm -rf "$TEMP_DIR/"*
-        mkdir "$TEMP_DIR/barrier"
-        mkdir "$TEMP_DIR/test_dir"
-    }
-
-    distributed_tear_down() {
-        rm -rf "$TEMP_DIR"
-    }
-
-    trap distributed_tear_down EXIT SIGHUP SIGINT SIGTERM
-
-    echo "Running distributed tests for the TCP backend"
-    distributed_set_up
-    BACKEND=tcp WORLD_SIZE=3 $PYCMD ./test_distributed.py
-    distributed_tear_down
-
-    echo "Running distributed tests for the Gloo backend"
-    distributed_set_up
-    BACKEND=gloo WORLD_SIZE=3 $PYCMD ./test_distributed.py
-    distributed_tear_down
-
-    echo "Running distributed tests for the MPI backend"
-    distributed_set_up
-    BACKEND=mpi mpiexec -n 3 $PYCMD ./test_distributed.py
-    distributed_tear_down
+if [ -x "$(command -v mpiexec)" ]; then
+  echo "Running distributed tests for the MPI backend"
+  distributed_set_up
+  BACKEND=mpi mpiexec -n 3 $PYCMD ./test_distributed.py
+  distributed_tear_down
+else
+  echo "Skipping MPI backend tests (MPI not found)"
 fi
-################################################################################
 
 if [[ $COVERAGE -eq 1 ]]; then
     coverage combine
