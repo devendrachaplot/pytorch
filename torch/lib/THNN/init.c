@@ -191,10 +191,10 @@
 #include "generic/SpatialConvolutionMM.c"
 #include "THGenerateFloatTypes.h"
 
-#include "generic/SpatialDepthWiseConvolution.c"
+#include "generic/SpatialConvolutionLocal.c"
 #include "THGenerateFloatTypes.h"
 
-#include "generic/SpatialConvolutionLocal.c"
+#include "generic/SpatialConvolutionLocalBatch.c"
 #include "THGenerateFloatTypes.h"
 
 #include "generic/SpatialFullConvolution.c"
@@ -271,10 +271,3 @@
 
 #include "generic/VolumetricReplicationPadding.c"
 #include "THGenerateFloatTypes.h"
-
-#include "generic/VolumetricUpSamplingNearest.c"
-#include "THGenerateFloatTypes.h"
-
-#include "generic/VolumetricUpSamplingTrilinear.c"
-#include "THGenerateFloatTypes.h"
-
