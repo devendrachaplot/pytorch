@@ -194,6 +194,9 @@
 #include "generic/SpatialConvolutionLocal.c"
 #include "THGenerateFloatTypes.h"
 
+#include "generic/SpatialConvolutionLocalBatch.c"
+#include "THGenerateFloatTypes.h"
+
 #include "generic/SpatialFullConvolution.c"
 #include "THGenerateFloatTypes.h"
 

@@ -579,6 +579,49 @@ TH_API void THNN_(SpatialConvolutionLocal_accGradParameters)(
                   long outputWidth, long outputHeight,
                   accreal scale);
 
+TH_API void THNN_(SpatialConvolutionLocalBatch_updateOutput)(
+                  THCState *state,
+                  THCTensor *input,
+		            THCTensor *output,
+						THCTensor *weight,
+						THCTensor *bias,
+						THCTensor *finput,
+						THCTensor *fgradInput,
+						int kW, int kH,
+						int dW, int dH,
+						int padW, int padH,
+						long inputWidth, long inputHeight,
+						long outputWidth, long outputHeight);
+
+TH_API void THNN_(SpatialConvolutionLocalBatch_updateGradInput)(
+                  THCState *state,
+						THCTensor *input,
+						THCTensor *gradOutput,
+						THCTensor *gradInput,
+						THCTensor *weight,
+						THCTensor *finput,
+						THCTensor *fgradInput,
+						int kW, int kH,
+						int dW, int dH,
+						int padW, int padH,
+						long inputWidth, long inputHeight,
+						long outputWidth, long outputHeight);
+
+TH_API void THNN_(SpatialConvolutionLocalBatch_accGradParameters)(
+                  THCState *state,
+						THCTensor *input,
+						THCTensor *gradOutput,
+						THCTensor *gradWeight,
+						THCTensor *gradBias,
+						THCTensor *finput,
+						THCTensor *fgradInput,
+						int kW, int kH,
+						int dW, int dH,
+						int padW, int padH,
+						long inputWidth, long inputHeight,
+						long outputWidth, long outputHeight,
+						accreal scale);
+																				
 TH_API void THNN_(SpatialConvolutionMM_updateOutput)(
                   THCState *state,
                   THCTensor *input,
